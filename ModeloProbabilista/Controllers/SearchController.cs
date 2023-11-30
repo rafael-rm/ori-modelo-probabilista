@@ -6,6 +6,12 @@ using ModeloProbabilista.Util;
 
 namespace ModeloProbabilista.Controllers;
 
+public class Request
+{
+    public string query { get; set; }
+    public List<string> documents { get; set; }
+}
+
 public class SearchController : Controller
 {
     private static IndexGeneretor? _indexInstance;
@@ -37,6 +43,18 @@ public class SearchController : Controller
         var result = await IndexGeneretor.Search(query);
 
         return View(result);
+    }
+    
+    [HttpPost("SearchResultFeedback")]
+    public async Task<IActionResult> SearchResultFeedback([FromBody] Request req)
+    {
+        if (_indexInstance is null)
+            _indexInstance = new IndexGeneretor();
+
+        var result = await IndexGeneretor.RelevanceFeedbackSearch(req.query, req.documents);
+        var ret = Json(result);
+
+        return ret;
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

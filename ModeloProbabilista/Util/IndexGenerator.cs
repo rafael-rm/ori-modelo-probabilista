@@ -184,7 +184,7 @@ public class IndexGeneretor
         
 
         return scores
-            .Where(s => s.Value > 0)
+            .Where(s => s.Value != 0)
             .OrderByDescending(s => s.Value)
             .ToDictionary(s => s.Key, s => s.Value);
     }

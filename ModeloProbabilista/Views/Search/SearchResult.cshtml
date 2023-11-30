@@ -6,20 +6,24 @@
 
 <h2>Resultados da Pesquisa</h2>
 
-<ul>
+<ul id="resultList">
     @foreach (var result in Model)
     {
         <li>
-            <a href="javascript:void(0);" class="open-html" data-filename="@result.Key">@result.Key</a> - Pontuação: @result.Value
+            <a href="javascript:void(0);" class="open-html" data-filename="@result.Key">@result.Key</a> - Pontuação: @Math.Round(result.Value, 2)
+            <button class="btn-mark-relevant" data-filename="@result.Key">Marcar como Relevante</button>
         </li>
     }
 </ul>
 
-<p>Total de resultados: @Model.Count</p>
+<p id="totalResults">Total de resultados: @Model.Count</p>
 
+<button class="btn btn-success" id="btn-realizar-nova-busca">Realizar Nova Busca</button>
 <a href="javascript:history.go(-1);" class="btn btn-primary">Voltar</a>
 
 <script>
+    var arquivosRelevantes = [];
+
     document.querySelectorAll('.open-html').forEach(function(link) {
         link.addEventListener('click', function() {
             var fileName = this.getAttribute('data-filename');
@@ -27,4 +31,61 @@
             window.open(url, '_blank');
         });
     });
+    
+    document.querySelectorAll('.btn-mark-relevant').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var fileName = this.getAttribute('data-filename');
+            arquivosRelevantes.push(fileName);
+        });
+    });
+
+    document.getElementById('btn-realizar-nova-busca').addEventListener('click', function() {
+        var urlParams = new URLSearchParams(window.location.search);
+        var query = urlParams.get('query');
+    
+        fetch('/SearchResultFeedback', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                query: query,
+                documents: arquivosRelevantes
+            })
+        })
+        .then(response => response.json())
+        .then(result => {
+            var resultList = Object.entries(result);    
+            updateResults(resultList);
+        });
+    
+        function updateResults(newResults) {
+            var resultList = document.getElementById('resultList');
+            var totalResults = document.getElementById('totalResults');
+            resultList.innerHTML = '';
+    
+    
+            newResults.forEach(function([key, value]) {
+                var li = document.createElement('li');
+                li.innerHTML = '<a href="javascript:void(0);" class="open-html" data-filename="' + key + '">' + key + '</a> - Pontuação: ' + value;
+                resultList.appendChild(li);
+            });
+    
+            totalResults.innerText = 'Total de resultados: ' + newResults.length;
+    
+            document.querySelectorAll('.open-html').forEach(function(link) {
+                link.addEventListener('click', function() {
+                    var fileName = this.getAttribute('data-filename');
+                    var url = '/Search/OpenHtml?fileName=' + fileName;
+                    window.open(url, '_blank');
+                });
+            });
+        }
+    });
 </script>
+
+<style>
+    #resultList li {
+        margin-bottom: 2px;
+    }
+</style>
