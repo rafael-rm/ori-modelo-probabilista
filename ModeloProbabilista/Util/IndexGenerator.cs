@@ -53,7 +53,7 @@ public class IndexGeneretor
 
     public static async Task StartIndex()
     {
-        if (_idf.Count == 0 || _termsInDocs.Count == 0)
+        if (!_idf.Any() || !_termsInDocs.Any())
         {
             var projectDirectory = Directory.GetParent(Environment.CurrentDirectory)?.FullName;
 
@@ -113,7 +113,8 @@ public class IndexGeneretor
     
     public static async Task<Dictionary<string, double>> Search(string consulta)
     {
-        await StartIndex();
+        if (!_idf.Any() || !_termsInDocs.Any())
+            await StartIndex();
         
         var scores = new Dictionary<string, double>();
         var consultaTerms = consulta.Split(' ').Select(term => term.ToLower()).ToList();
