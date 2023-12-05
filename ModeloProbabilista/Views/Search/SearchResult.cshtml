@@ -82,6 +82,12 @@
             });
         }
     });
+    
+    document.querySelectorAll('.btn-mark-relevant').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            this.style.backgroundColor = 'green';
+        });
+    });
 </script>
 
 <style>

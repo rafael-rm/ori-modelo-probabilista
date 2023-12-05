@@ -78,7 +78,7 @@ public class SearchController : Controller
         _indexInstance = new IndexGeneretor();
         var projectDirectory = Directory.GetParent(Environment.CurrentDirectory)?.FullName;
         var pathFolderIdf = projectDirectory + "\\ModeloProbabilista\\Data\\idf.json";
-        var pathFolderTfidf = projectDirectory + "\\ModeloProbabilista\\Data\\tfidf.json";
+        var pathFolderTfidf = projectDirectory + "\\ModeloProbabilista\\Data\\termsInDocs.json";
         System.IO.File.Delete(pathFolderIdf);
         System.IO.File.Delete(pathFolderTfidf);
         await IndexGeneretor.StartIndex();
